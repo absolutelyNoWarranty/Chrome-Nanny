@@ -160,11 +160,13 @@ function getFormattedStr(numberToFormat, strInSingle)
 
 function getBlockSetStr(blockSetDtls)
 {
-	var dtlsStr = "<table border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='95%'>";
-	var allTagsForBlockSet = getAllTagsForUrl(blockSetDtls.internalName);
+    var internalName = blockSetDtls.internalName;
 
-	var editStr =  "&nbsp;&nbsp;<button onclick='javascript:editBlockListedUrl(\"" + blockSetDtls.internalName + "\")';>Edit</button>";
-	var deleteStr =  "&nbsp;&nbsp; <button onclick='javascript:removeBlockedUrl(\"" + blockSetDtls.internalName + "\");'>Delete</button>";
+	var dtlsStr = "<table border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='95%'>";
+	var allTagsForBlockSet = getAllTagsForUrl(internalName);
+
+	var editStr =  "&nbsp;&nbsp;<button id=\"edit" + internalName + "\">Edit</button>";
+	var deleteStr =  "&nbsp;&nbsp; <button id=\"remove" + internalName + "\">Delete</button>";
 	var editDeleteStr = "<span style='float:right;'>" + editStr + deleteStr + "</span>";
 
 	dtlsStr = dtlsStr + "<tr class='tDataGridHeader'><td colspan='2'>" + blockSetDtls.name + editDeleteStr + "</td></tr>";
@@ -177,6 +179,16 @@ function getBlockSetStr(blockSetDtls)
 
 	return dtlsStr;
 }
+
+function addBlockSetHandlers(blockSetDtls)
+{
+    var internalName = blockSetDtls.internalName;
+
+    document.getElementById("edit" + internalName).addEventListener('click', function() { editBlockListedUrl(internalName); });
+    document.getElementById("remove" + internalName).addEventListener('click', function() { removeBlockedUrl(internalName); });
+}
+
+
 
 function callConfirm(message,operation, operand)
 {
@@ -281,6 +293,7 @@ function populateBlockSets()
 		blockSetDtls = getBlockSetDtls(blockSetName);
 		dtlsStr = getBlockSetStr(blockSetDtls);
 		$("#allBlockSetsTbl").append("<tr class='tDataGridElement'><td>" + dtlsStr + "<p/></td></tr>");
+        addBlockSetHandlers(blockSetDtls);
 	});
 	updateBlockSetsInOtherTabs();
 }
@@ -809,7 +822,7 @@ function populateLockDown()
 	if(!isIntervalSet)
 	{
 		isIntervalSet = true;
-		optionIntervalTimerId = setInterval('refreshLockDownDtls()', 60 * 1000); //1 minute
+		optionIntervalTimerId = setInterval(function() { refreshLockDownDtls(); }, 60 * 1000); //1 minute
 	}
 	
 	refreshLockDownDtls();
@@ -961,4 +974,37 @@ function beginLockDown()
 	refreshLockDownDtls();
 }
 
+var isIntervalSet = false;
+var optionIntervalTimerId = "";
 
+document.addEventListener('DOMContentLoaded', function () {
+    //done to get stats that are updated until NOW !
+    chrome.extension.getBackgroundPage().BackGroundManager.storeStats();
+    $("#tabs").tabs();
+    populateBlockSets();
+    populateWhiteListedUrls();
+    populateTags();
+    populateGenOptions();
+    populateLockDown();
+    setupDatePickers();
+    setupAllDialogs();
+
+    document.getElementById("addTagToBlockList").addEventListener('click', addTagToBlockListDiv);
+    document.getElementById("addToBlockList").addEventListener('click', addBlockSet);
+    document.getElementById("clearBlockListTags").addEventListener('click', clearBlockListUrlTags);
+    document.getElementById("clearBlockList").addEventListener('click', clearBlockListBlock);
+    document.getElementById("addTagToWhiteList").addEventListener('click', addTagToWhiteListDiv);
+    document.getElementById("addToWhiteList").addEventListener('click', addUrlToWhiteList);
+    document.getElementById("clearWhiteListTags").addEventListener('click', clearWhiteListUrlTags);
+    document.getElementById("clearWhiteList").addEventListener('click', clearWhiteListBlock);
+    document.getElementById("addToTags").addEventListener('click', addTag);
+    document.getElementById("saveGenOptions").addEventListener('click', saveGeneralOptions);
+    document.getElementById("refreshLockDownDtlsBtn").addEventListener('click', refreshLockDownDtls);
+    document.getElementById("selectAllLockDownBtn").addEventListener('click', selectAllLockDown);
+    document.getElementById("unSelectAllLockDownBtn").addEventListener('click', unSelectAllLockDown);
+    document.getElementById("beginLockDownBtn").addEventListener('click', beginLockDown);
+    document.getElementById("validateRegExpBtn").addEventListener('click', validateRegExp);
+    document.getElementById("resetRegExpFldsBtn").addEventListener('click', resetRegExpFlds);
+    document.getElementById("calcCharts").addEventListener('click', plotCharts);
+
+});

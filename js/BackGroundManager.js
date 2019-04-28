@@ -88,7 +88,7 @@ BackGroundManager = {
 		BackGroundManager.tags = getAllTags();
 		BackGroundManager.genOptions = getGeneralOptions();
 		BackGroundManager.inactiveTimerInterval = 60 * 1000; //1 minute
-		BackGroundManager.intervalTimerId = setInterval('BackGroundManager.checkForInActivity()', BackGroundManager.inactiveTimerInterval);
+		BackGroundManager.intervalTimerId = setInterval(function () { BackGroundManager.checkForInActivity(); }, BackGroundManager.inactiveTimerInterval);
 
 		BackGroundManager.initializeHrLtStats();
 	},
@@ -739,3 +739,10 @@ function giggig()
 	console.log('giggig called');	
 	BackGroundManager.intervalTimerId4 = setTimeOut('BackGroundManager.giggig()', BackGroundManager.inactiveTimerInterval);
 }
+
+// Add event listeners once the DOM has fully loaded by listening for the
+// `DOMContentLoaded` event on the document, and adding your listeners to
+// specific elements when it triggers.
+document.addEventListener('DOMContentLoaded', function () {
+	BackGroundManager.initAll();
+});
