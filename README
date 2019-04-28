@@ -1,1 +1,5 @@
 This project contains the code for Chrome Nanny.
+
+Chrome Nanny is no longer maintened by it's creator. This fork
+updates the code base so you can install it with the latest
+versions of Chrome.
